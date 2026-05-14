@@ -1,0 +1,84 @@
+# ─── macOS ────────────────────────────────────────────────────
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.AppleDouble
+
+# ─── エディタ ──────────────────────────────────────────────────
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+
+# ─── 環境変数 ──────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ─── assets ────────────────────────────────────────────────────
+assets/fonts/*
+!assets/fonts/.gitkeep
+assets/frames/*
+!assets/frames/.gitkeep
+assets/sounds/*
+!assets/sounds/.gitkeep
+assets/stamps/*
+!assets/stamps/.gitkeep
+
+# ─── フロントエンド（Node.js / Vite / Svelte）─────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.vite/
+*.local
+
+# ログ
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# ─── Wasm 生成ファイル（emcc ビルド成果物）────────────────────
+frontend/src/wasm/pen_engine.js
+frontend/src/wasm/pen_engine.wasm
+
+# ─── バックエンド（Python）─────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+.venv/
+venv/
+env/
+ENV/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+*.cover
+
+# ─── C++ / Wasm ビルド成果物 ──────────────────────────────────
+pen_engine/build/
+pen_engine/dist/
+*.o
+*.a
+*.so
+*.dylib
+
+# ─── 作業メモ・設計ドキュメント ───────────────────────────────
+# documents/
+
+# ─── その他 ────────────────────────────────────────────────────
+*.bak
+*.orig
+Thumbs.db

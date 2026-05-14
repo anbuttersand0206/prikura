@@ -1,0 +1,31 @@
+services:
+  # ── バックエンド (FastAPI + uvicorn) ────────────────────────────
+  backend:
+    build:
+      context: ./backend
+    container_name: prikura-backend
+    restart: unless-stopped
+    networks:
+      - prikura
+    # 外部には公開しない（nginx 経由でのみアクセス）
+
+  # ── nginx (リバースプロキシ + フロントエンド配信) ───────────────
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    container_name: prikura-nginx
+    ports:
+      - "80:80"
+    environment:
+      - BASIC_AUTH_USER=${BASIC_AUTH_USER}
+      - BASIC_AUTH_PASSWORD=${BASIC_AUTH_PASSWORD}
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - prikura
+
+networks:
+  prikura:
+    driver: bridge

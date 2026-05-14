@@ -1,0 +1,51 @@
+# ── nginx Dockerfile が必要とするもの ────────────────────────────
+# frontend/   → Stage1 でビルド
+# assets/fonts/ → Stage2 で /fonts/ として配信
+# nginx/      → nginx.conf をコピー
+# 上記以外はすべて除外する
+
+# ── Git / CI ──────────────────────────────────────────────────
+.git/
+.gitignore
+.gitattributes
+.dockerignore
+
+# ── 環境変数（絶対に含めない） ────────────────────────────────
+.env
+.env.*
+
+# ── バックエンド（nginx ビルドコンテキストでは不要） ────────────
+backend/
+
+# ── C++ / Wasm ソース ─────────────────────────────────────────
+pen_engine/
+
+# ── ドキュメント類 ────────────────────────────────────────────
+documents/
+*.md
+LICENSE
+THIRD_PARTY_LICENSES.md
+
+# ── nginx が配信しない assets ─────────────────────────────────
+# fonts/ sounds/ stamps/ は Stage2 で COPY するため除外しない
+assets/frames/
+
+# ── フロントエンドビルド不要ファイル ─────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/src/wasm/
+
+# ── Python キャッシュ ─────────────────────────────────────────
+**/__pycache__/
+*.pyc
+*.pyo
+backend/.venv/
+backend/venv/
+
+# ── macOS ────────────────────────────────────────────────────
+.DS_Store
+._*
+
+# ── ログ ──────────────────────────────────────────────────────
+*.log

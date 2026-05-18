@@ -16,7 +16,7 @@
 // ============================================================
 
 import type { PenConfig } from './index';
-import { catmullRom } from './index';
+import { interpolate } from '../wasm/penEngineLoader';
 
 // ── ペン定義 ──────────────────────────────────────────────────
 
@@ -34,7 +34,7 @@ export const group4Pens: PenConfig[] = [
     color: '#FF85A1',
     opacity: 0.5,
     render(ctx, points, size, color, opacity) {
-      const smooth = catmullRom(points);
+      const smooth = interpolate(points);
       if (smooth.length < 2) return;
       ctx.save();
       ctx.globalAlpha = 0.5 * opacity; // ユーザーの不透明度設定をさらに半分に
@@ -68,7 +68,7 @@ export const group4Pens: PenConfig[] = [
     color: '#FF85A1',
     opacity: 1,
     render(ctx, points, size, color, opacity) {
-      const smooth = catmullRom(points);
+      const smooth = interpolate(points);
       if (smooth.length < 2) return;
 
       // 中間バッファ: 半透明塗り
@@ -130,7 +130,7 @@ export const group4Pens: PenConfig[] = [
     color: '#FF85A1',
     opacity: 0.8,
     render(ctx, points, size, color, opacity) {
-      const smooth = catmullRom(points);
+      const smooth = interpolate(points);
       if (smooth.length < 2) return;
       ctx.save();
       ctx.globalAlpha = opacity;

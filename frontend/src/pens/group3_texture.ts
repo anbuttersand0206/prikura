@@ -13,7 +13,7 @@
 // ============================================================
 
 import type { PenConfig, Point } from './index';
-import { catmullRom } from './index';
+import { interpolate } from '../wasm/penEngineLoader';
 
 // ── 決定論的ハッシュ関数 ─────────────────────────────────────
 /**
@@ -47,7 +47,7 @@ export const group3Pens: PenConfig[] = [
     color: '#FF85A1',
     opacity: 1,
     render(ctx, points, size, color, opacity) {
-      const smooth = catmullRom(points);
+      const smooth = interpolate(points);
       if (smooth.length < 2) return;
       ctx.save();
       ctx.globalAlpha = opacity;
@@ -91,7 +91,7 @@ export const group3Pens: PenConfig[] = [
     color: '#FF85A1',
     opacity: 1,
     render(ctx, points, size, color, opacity) {
-      const smooth = catmullRom(points);
+      const smooth = interpolate(points);
       if (smooth.length < 2) return;
       ctx.save();
       ctx.globalAlpha = opacity;
@@ -147,7 +147,7 @@ export const group3Pens: PenConfig[] = [
     color: '#FF85A1',
     opacity: 0.85,
     render(ctx, points, size, color, opacity) {
-      const smooth = catmullRom(points);
+      const smooth = interpolate(points);
       if (smooth.length < 2) return;
       ctx.save();
       ctx.lineCap = 'round';

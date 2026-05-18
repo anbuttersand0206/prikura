@@ -1,6 +1,7 @@
 #include <emscripten/emscripten.h>
 #include <cmath>
 #include <cstdint>
+#include <vector>
 #include <algorithm>
 
 extern "C" {

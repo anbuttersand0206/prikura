@@ -67,6 +67,13 @@ function serveStamps() {
 
 export default defineConfig({
   plugins: [tailwindcss(), svelte(), serveFonts(), serveSounds(), serveStamps()],
+  // .wasm ファイルを静的アセットとして扱い、emscripten の new URL() パターンで
+  // バンドル時に正しく解決されるようにする
+  assetsInclude: ['**/*.wasm'],
+  build: {
+    // WebAssembly / top-level await に対応するため esnext をターゲットに指定
+    target: 'esnext',
+  },
   server: {
     port: 5173,
     proxy: {

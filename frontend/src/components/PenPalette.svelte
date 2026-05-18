@@ -64,7 +64,8 @@
     {x: 27, y: 8},  {x: 36, y: 18}, {x: 44, y: 9}, {x: 50, y: 16},
   ];
 
-  let previewCanvases: (HTMLCanvasElement | null)[] = allPens.map(() => null);
+  // Svelte 5 では bind:this でインデックスアクセスする配列は $state() が必要
+  let previewCanvases = $state<(HTMLCanvasElement | null)[]>(allPens.map(() => null));
 
   function renderPreviews() {
     allPens.forEach((pen, i) => {

@@ -64,11 +64,38 @@ docker version
 
 ## プリクラアプリで試す
 
+### パターン A: JS フォールバック版（emscripten 不要・推奨）
+
+Wasm をビルドしなくても、スプライン補間の JS 実装で全ペンが動作する。  
+Wasm ファイルが存在しない場合、nginx の Dockerfile ビルド中にスタブが自動生成され、  
+`penEngineLoader.ts` の try/catch がそれを検知して JS 版に切り替える。
+
 ```bash
 cd /path/to/prikura
+cp .env.example .env
+# .env の BASIC_AUTH_USER・BASIC_AUTH_PASSWORD を任意の値に変更
 
 docker compose up --build
-# → http://localhost でアクセス（想定）
+# → http://localhost でアクセス（Basic 認証あり）
+```
+
+### パターン B: Wasm 版を有効にしてビルドする
+
+ホスト側で事前に Wasm をビルドしてから Docker イメージを作る。  
+生成された `pen_engine.js` / `pen_engine.wasm` がイメージに取り込まれ、Wasm 版が有効になる。
+
+```bash
+# 1. emscripten をインストール（未インストールの場合）
+brew install emscripten
+
+# 2. Wasm をビルド（frontend/src/wasm/ に出力される）
+cd /path/to/prikura/frontend
+npm run build:wasm
+
+# 3. Docker イメージをビルド・起動
+cd /path/to/prikura
+docker compose up --build
+# → http://localhost でアクセス（Basic 認証あり）
 ```
 
 > ⚠️ Docker 構成ファイルは用意しているが動作未検証。  

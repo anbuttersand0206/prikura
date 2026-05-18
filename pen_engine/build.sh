@@ -23,6 +23,7 @@ emcc -O3 \
     -s EXPORTED_RUNTIME_METHODS='["cwrap","ccall","HEAPU8","HEAPF32"]' \
     -s MODULARIZE=1 \
     -s EXPORT_NAME='PenEngine' \
+    -s EXPORT_ES6=1 \
     -s ALLOW_MEMORY_GROWTH=1 \
     --no-entry \
     -o "$OUT_DIR/pen_engine.js"

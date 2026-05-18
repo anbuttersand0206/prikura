@@ -51,7 +51,18 @@ graph TB
                 G2["ベーシック系\nノーマル / ふち系"]
                 G3["質感系\nぷっくり / クレヨン"]
                 G4["透明・ぼかし系"]
+                WL["penEngineLoader.ts\nWasm / JS 自動切替"]
+                G1 & G2 & G3 & G4 --> WL
             end
+
+            subgraph WasmEngine["Wasm ペンエンジン（オプション）"]
+                WJ["pen_engine.js\n(Emscripten 生成)"]
+                WW["pen_engine.wasm\n(C++ コンパイル済み)"]
+                WJ --- WW
+            end
+
+            WL -->|"ロード済みなら"| WasmEngine
+            WL -->|"未ロード時"| JSFallback["JS フォールバック\n(catmullRom)"]
         end
     end
 
@@ -93,6 +104,7 @@ graph TB
 ## 技術的なこだわり
 
 - **15 種ペンの独自実装** — Catmull-Rom スプライン補間（tension パラメータ対応）を全ペン共通で適用。ネオンふち・半透明ふちは `OffscreenCanvas` + `destination-out` で内部を抜く中空ストロークを実現。クレヨンは決定論的ハッシュで再描画しても形が変わらない安定テクスチャを実装。
+- **C++ Wasm ペンエンジン** — スプライン補間のホットパスを C++（Emscripten）でコンパイルし WebAssembly として提供。`penEngineLoader.ts` が起動時に非同期でロードし、ロード完了後は全ペンの `render()` が自動的に Wasm 版へ切り替わる。Wasm 未ビルド時は JS 純正実装へ透過的にフォールバックするため、emscripten なしでも動作する。
 - **高品質レタッチ（22 機能）** — `cv2.remap` ベクトル化変位マップで 15 種のフェイスワープを 1 回の remap にまとめて高速化。スクリーン／乗算ブレンドによる自然な明るさ調整。口サイズは口中心を基点とした `scale_region` で拡縮する。
 - **中顔面短縮の実装** — 目下端をアンカーとし、顎先に向かうにつれて上方向シフトが線形に大きくなる勾配変位で実装。顔幅方向は 2 次フォールオフで自然に馴染ませる。鼻・口・顎が目側へ詰まり、下顔面全体が短縮して見える。
 - **背景置換の精度向上** — MediaPipe Selfie Segmentation の確率マスクにシグモイド圧縮（遷移帯 0.3〜0.65 に圧縮）と形態素クローズ（11×11 楕円カーネル）を適用し、人物輪郭・髪の隙間を正確に検出。並行 API コールによるスレッド安全性は `threading.Lock` で保証。
@@ -135,6 +147,7 @@ graph TB
 | フロントエンド | Svelte 5 + Vite + TypeScript |
 | アニメーション | GSAP 3 |
 | アイコン | lucide-svelte（ISC） |
+| ペンエンジン | C++ + Emscripten → WebAssembly（JS フォールバック付き） |
 | バックエンド | Python 3.11 + FastAPI + Uvicorn |
 | 顔認識 | MediaPipe Face Mesh（468 点）+ Selfie Segmentation |
 | 画像処理 | OpenCV + NumPy + SciPy |
@@ -158,6 +171,7 @@ graph TB
 - Node.js 18+
 - Python 3.11+
 - Docker（Docker Desktop または Colima + Docker CLI）
+- Emscripten（Wasm ペンエンジンをビルドする場合のみ。未インストール時は JS 版で自動動作）
 
 ---
 
@@ -171,13 +185,29 @@ pip install -r requirements.txt
 uvicorn main:app --port 8000 --reload
 ```
 
-### フロントエンド
+### フロントエンド（JS 版・Wasm なし）
 
 ```bash
 cd frontend
 npm install
 npm run dev
 # → http://localhost:5173 でアクセス
+# Wasm 未ビルドの場合は JS フォールバックで自動動作します
+```
+
+### Wasm ペンエンジンを有効にする（オプション）
+
+```bash
+# emscripten が未インストールの場合は brew が自動的にインストールします
+cd frontend
+npm run build:wasm
+# → frontend/src/wasm/pen_engine.js + pen_engine.wasm が生成される
+
+# 以降は通常どおり起動するだけで Wasm 版が使われます
+npm run dev
+
+# または Wasm ビルド → Vite ビルドを一括で実行
+npm run build:all
 ```
 
 ### Docker
@@ -203,16 +233,23 @@ prikura/
 │   ├── fonts/           # カスタムフォント（HachiMaruPop・平成ギャル丈字）
 │   ├── sounds/          # BGM（moeru music.）3 トラック
 │   └── stamps/          # スタンプ PNG 画像 24 種（001.png 〜 024.png）
+├── pen_engine/          # C++ Wasm ペンエンジン
+│   ├── src/
+│   │   ├── stroke_interpolator.cpp   # Catmull-Rom スプライン補間
+│   │   └── effects/                  # neon / jitter / crayon / pukkuri
+│   └── build.sh         # emcc でコンパイルして frontend/src/wasm/ に出力
 ├── frontend/
 │   └── src/
 │       ├── phases/      # Setup.svelte / Camera.svelte / Edit.svelte
 │       ├── components/  # PenCanvas / PenPalette / RetouchSliders / StampPanel / FrameCanvas
 │       ├── pens/        # 15 種ペン実装（4グループ）
+│       ├── wasm/        # penEngineLoader.ts（Wasm/JS 自動切替）
+│       │                # pen_engine.js + pen_engine.wasm（build:wasm 後に生成）
 │       └── stores/
 │           ├── appState.ts   # フレーム・フェーズ・選択状態の一元管理
 │           └── bgmStore.ts   # BGM ON/OFF グローバルストア
 ├── backend/
-│   ├── main.py          # FastAPI エンドポイント（WS・bg_replace・beauty_retouch）
+│   ├── main.py          # FastAPI エンドポイント（bg_replace・beauty_retouch）
 │   ├── beauty/          # 顔加工パイプライン（pipeline / warp / color / smoothing / landmarks）
 │   └── requirements.txt
 ├── nginx/               # リバースプロキシ設定

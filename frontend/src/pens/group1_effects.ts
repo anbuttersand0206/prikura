@@ -11,7 +11,7 @@
 // ============================================================
 
 import type { PenConfig, Point } from './index';
-import { catmullRom } from './index';
+import { interpolate } from '../wasm/penEngineLoader';
 
 export const group1Pens: PenConfig[] = [
 
@@ -26,7 +26,7 @@ export const group1Pens: PenConfig[] = [
     color: '#FF85A1',
     opacity: 1,
     render(ctx, points, size, color, opacity) {
-      const smooth = catmullRom(points); // まずなめらかな曲線に変換
+      const smooth = interpolate(points); // まずなめらかな曲線に変換
       if (smooth.length < 2) return;
 
       ctx.save(); // 以下の描画設定を他に影響させないよう保存
@@ -85,7 +85,7 @@ export const group1Pens: PenConfig[] = [
     color: '#FF85A1',
     opacity: 1,
     render(ctx, points, size, color, opacity) {
-      const smooth = catmullRom(points);
+      const smooth = interpolate(points);
       if (smooth.length < 2) return;
       ctx.save();
       ctx.globalAlpha = opacity;
@@ -135,7 +135,7 @@ export const group1Pens: PenConfig[] = [
     color: '#A29BFE',
     opacity: 1,
     render(ctx, points, size, color, opacity) {
-      const smooth = catmullRom(points);
+      const smooth = interpolate(points);
       if (smooth.length < 2) return;
       ctx.save();
       ctx.lineCap = 'round';
@@ -194,7 +194,7 @@ export const group1Pens: PenConfig[] = [
     color: '#00B894',
     opacity: 1,
     render(ctx, points, size, color, opacity) {
-      const smooth = catmullRom(points);
+      const smooth = interpolate(points);
       if (smooth.length < 2) return;
 
       // ── オフスクリーンキャンバスでリング形状を作る ──────────

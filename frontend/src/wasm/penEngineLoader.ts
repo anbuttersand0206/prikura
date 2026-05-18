@@ -29,6 +29,8 @@ type WasmModule = {
 /** ロード済みのエンジンをキャッシュする変数（2回目以降は再ロード不要） */
 let _engine: WasmModule | null = null;
 
+const TAG = '[PenEngine]';
+
 /**
  * Wasm モジュールのロードを試みる。
  * ロードに失敗した場合（ファイルが存在しない・対応ブラウザでないなど）は
@@ -36,16 +38,23 @@ let _engine: WasmModule | null = null;
  */
 async function tryLoadWasm(): Promise<WasmModule | null> {
   try {
+    // console.log(`${TAG} Wasm ロード開始 … (この間は TypeScript 版で動作)`);
+    const t0 = performance.now();
+
     // 動的インポート — .wasm が存在しない場合ここで例外が発生する
     const PenEngineFactory = await import('./pen_engine.js' as string) as any;
     // Emscripten が生成したファクトリ関数を呼んでモジュールを初期化
     const mod = await PenEngineFactory.default();
+
+    const elapsed = (performance.now() - t0).toFixed(1);
 
     // C++ 関数を JS から呼べるようにラップ（cwrap = C function wrap）
     // 引数: (関数名, 戻り値型, [引数型の配列])
     const interpolateFn = mod.cwrap('catmull_rom_interpolate', 'number', [
       'number', 'number', 'number', 'number', 'number',
     ]);
+
+    // console.log(`${TAG} ✅ Wasm ロード完了 (${elapsed}ms) — C++ 版に切り替えました`);
 
     return {
       isWasm: true,
@@ -96,8 +105,8 @@ async function tryLoadWasm(): Promise<WasmModule | null> {
         return result;
       },
     };
-  } catch {
-    // Wasm ファイルが見つからない・非対応環境などは null を返す
+  } catch (err) {
+    console.warn(`${TAG} ⚠️ Wasm ロード失敗 — TypeScript 版にフォールバック`, err);
     return null;
   }
 }
@@ -112,11 +121,41 @@ export async function getPenEngine(): Promise<WasmModule> {
 
   const wasm = await tryLoadWasm();
 
-  // Wasm が使えたら Wasm 版、使えなければ JS フォールバック版を使う
-  _engine = wasm ?? {
-    isWasm: false,
-    catmullRomInterpolate: catmullRom, // JS 純正実装（pens/index.ts）
-  };
+  if (wasm) {
+    _engine = wasm;
+  } else {
+    _engine = { isWasm: false, catmullRomInterpolate: catmullRom };
+    // console.log(`${TAG} 🟡 TypeScript 版で動作中 (Wasm 未ビルドまたは非対応環境)`);
+  }
 
   return _engine;
+}
+
+/** 切り替えログを1回だけ出すためのフラグ */
+let _switchLogged = false;
+
+/**
+ * 同期的にスプライン補間を行う。
+ * Wasm がロード済みならば Wasm 版、未ロードなら JS フォールバックを使う。
+ * ペンの render() は同期関数なので、このラッパーを介して呼ぶ。
+ */
+export function interpolate(pts: Point[], tension = 0.5): Point[] {
+  if (_engine) {
+    if (!_switchLogged) {
+      _switchLogged = true;
+      const label = _engine.isWasm ? '🔵 C++ Wasm 版' : '🟡 TypeScript 版';
+      // console.log(`${TAG} 補間エンジン確定: ${label}`);
+    }
+    return _engine.catmullRomInterpolate(pts, tension);
+  }
+  return catmullRom(pts, tension); // Wasm 未ロード時のフォールバック
+}
+
+/**
+ * アプリ起動時に Wasm を非同期で先読みする（fire-and-forget）。
+ * onMount などで呼ぶことで、最初のペン操作より前に Wasm を準備できる。
+ * 読み込みが完了すると以降の interpolate() 呼び出しが自動的に Wasm 版になる。
+ */
+export async function initPenEngine(): Promise<void> {
+  await getPenEngine();
 }

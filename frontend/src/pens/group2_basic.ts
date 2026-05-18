@@ -10,7 +10,7 @@
 // ============================================================
 
 import type { PenConfig, Point } from './index';
-import { catmullRom } from './index';
+import { interpolate } from '../wasm/penEngineLoader';
 
 export const group2Pens: PenConfig[] = [
 
@@ -25,7 +25,7 @@ export const group2Pens: PenConfig[] = [
     color: '#FF85A1',
     opacity: 1,
     render(ctx, points, size, color, opacity) {
-      const smooth = catmullRom(points); // なめらかな曲線に変換
+      const smooth = interpolate(points); // なめらかな曲線に変換
       if (smooth.length < 2) return;
       ctx.save();
       ctx.globalAlpha = opacity;
@@ -52,7 +52,7 @@ export const group2Pens: PenConfig[] = [
     color: '#FF85A1',
     opacity: 1,
     render(ctx, points, size, color, opacity) {
-      const smooth = catmullRom(points);
+      const smooth = interpolate(points);
       if (smooth.length < 2) return;
       ctx.save();
       ctx.globalAlpha = opacity;
@@ -83,7 +83,7 @@ export const group2Pens: PenConfig[] = [
     color: '#FF85A1',
     opacity: 1,
     render(ctx, points, size, color, opacity) {
-      const smooth = catmullRom(points);
+      const smooth = interpolate(points);
       if (smooth.length < 2) return;
       ctx.save();
       ctx.globalAlpha = opacity;
@@ -121,7 +121,7 @@ export const group2Pens: PenConfig[] = [
     color: '#FF85A1',
     opacity: 1,
     render(ctx, points, size, color, opacity) {
-      const smooth = catmullRom(points);
+      const smooth = interpolate(points);
       if (smooth.length < 2) return;
       ctx.save();
       ctx.globalAlpha = opacity;
@@ -166,7 +166,7 @@ export const group2Pens: PenConfig[] = [
     opacity: 1,
     render(ctx, points, size, color, opacity) {
       // tension を 0.8 にすることでより角張った曲線になる（ゆるっとした感じ）
-      const smooth = catmullRom(points, 0.8);
+      const smooth = interpolate(points, 0.8);
       if (smooth.length < 2) return;
       ctx.save();
       ctx.globalAlpha = opacity;

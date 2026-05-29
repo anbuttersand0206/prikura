@@ -42,28 +42,28 @@
     {#if open.has('skin')}
     <div class="sec-body">
       <div class="row">
-        <label>美肌 <span>{b.smoothing}</span></label>
-        <input type="range" min="0" max="100" value={b.smoothing}
+        <label for="sl-smoothing">美肌 <span>{b.smoothing}</span></label>
+        <input id="sl-smoothing" type="range" min="0" max="100" value={b.smoothing}
           oninput={(e) => updateParam('smoothing', +(e.target as HTMLInputElement).value)} />
       </div>
       <div class="row">
-        <label>シャープネス <span>{b.sharpness}</span></label>
-        <input type="range" min="0" max="100" value={b.sharpness}
+        <label for="sl-sharpness">シャープネス <span>{b.sharpness}</span></label>
+        <input id="sl-sharpness" type="range" min="0" max="100" value={b.sharpness}
           oninput={(e) => updateParam('sharpness', +(e.target as HTMLInputElement).value)} />
       </div>
       <div class="row">
-        <label>明るさ <span>{formatSigned(b.skinBrightness)}</span></label>
-        <input type="range" min="-100" max="100" value={b.skinBrightness}
+        <label for="sl-skin-brightness">明るさ <span>{formatSigned(b.skinBrightness)}</span></label>
+        <input id="sl-skin-brightness" type="range" min="-100" max="100" value={b.skinBrightness}
           oninput={(e) => updateParam('skinBrightness', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>色温度 <span>{formatSigned(b.skinWarmth)}</span></label>
-        <input type="range" min="-100" max="100" value={b.skinWarmth}
+        <label for="sl-skin-warmth">色温度 <span>{formatSigned(b.skinWarmth)}</span></label>
+        <input id="sl-skin-warmth" type="range" min="-100" max="100" value={b.skinWarmth}
           oninput={(e) => updateParam('skinWarmth', +(e.target as HTMLInputElement).value)} class="warm" />
       </div>
       <div class="row">
-        <label>美白 <span>{b.whitening}</span></label>
-        <input type="range" min="0" max="100" value={b.whitening}
+        <label for="sl-whitening">美白 <span>{b.whitening}</span></label>
+        <input id="sl-whitening" type="range" min="0" max="100" value={b.whitening}
           oninput={(e) => updateParam('whitening', +(e.target as HTMLInputElement).value)} />
       </div>
     </div>
@@ -79,33 +79,33 @@
     {#if open.has('face')}
     <div class="sec-body">
       <div class="row">
-        <label>顔痩せ <span>{formatSigned(b.faceSlim)}</span></label>
-        <input type="range" min="-100" max="100" value={b.faceSlim}
+        <label for="sl-face-slim">顔痩せ <span>{formatSigned(b.faceSlim)}</span></label>
+        <input id="sl-face-slim" type="range" min="-100" max="100" value={b.faceSlim}
           oninput={(e) => updateParam('faceSlim', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>頭サイズ <span>{formatSigned(b.headSize)}</span></label>
-        <input type="range" min="-100" max="100" value={b.headSize}
+        <label for="sl-head-size">頭サイズ <span>{formatSigned(b.headSize)}</span></label>
+        <input id="sl-head-size" type="range" min="-100" max="100" value={b.headSize}
           oninput={(e) => updateParam('headSize', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>中顔面短縮 <span>{formatSigned(b.midFace)}</span></label>
-        <input type="range" min="-100" max="100" value={b.midFace}
+        <label for="sl-mid-face">中顔面短縮 <span>{formatSigned(b.midFace)}</span></label>
+        <input id="sl-mid-face" type="range" min="-100" max="100" value={b.midFace}
           oninput={(e) => updateParam('midFace', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>頬横幅 <span>{formatSigned(b.cheekWidth)}</span></label>
-        <input type="range" min="-100" max="100" value={b.cheekWidth}
+        <label for="sl-cheek-width">頬横幅 <span>{formatSigned(b.cheekWidth)}</span></label>
+        <input id="sl-cheek-width" type="range" min="-100" max="100" value={b.cheekWidth}
           oninput={(e) => updateParam('cheekWidth', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>エラ削り <span>{formatSigned(b.jaw)}</span></label>
-        <input type="range" min="-100" max="100" value={b.jaw}
+        <label for="sl-jaw">エラ削り <span>{formatSigned(b.jaw)}</span></label>
+        <input id="sl-jaw" type="range" min="-100" max="100" value={b.jaw}
           oninput={(e) => updateParam('jaw', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>顎縦幅 <span>{formatSigned(b.chinLength)}</span></label>
-        <input type="range" min="-100" max="100" value={b.chinLength}
+        <label for="sl-chin-length">顎縦幅 <span>{formatSigned(b.chinLength)}</span></label>
+        <input id="sl-chin-length" type="range" min="-100" max="100" value={b.chinLength}
           oninput={(e) => updateParam('chinLength', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
     </div>
@@ -121,13 +121,13 @@
     {#if open.has('nose')}
     <div class="sec-body">
       <div class="row">
-        <label>小鼻サイズ <span>{formatSigned(b.noseWidth)}</span></label>
-        <input type="range" min="-100" max="100" value={b.noseWidth}
+        <label for="sl-nose-width">小鼻サイズ <span>{formatSigned(b.noseWidth)}</span></label>
+        <input id="sl-nose-width" type="range" min="-100" max="100" value={b.noseWidth}
           oninput={(e) => updateParam('noseWidth', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>鼻縦幅 <span>{formatSigned(b.noseHeight)}</span></label>
-        <input type="range" min="-100" max="100" value={b.noseHeight}
+        <label for="sl-nose-height">鼻縦幅 <span>{formatSigned(b.noseHeight)}</span></label>
+        <input id="sl-nose-height" type="range" min="-100" max="100" value={b.noseHeight}
           oninput={(e) => updateParam('noseHeight', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
     </div>
@@ -143,38 +143,38 @@
     {#if open.has('eye')}
     <div class="sec-body">
       <div class="row">
-        <label>目のサイズ <span>{formatSigned(b.eyeSize)}</span></label>
-        <input type="range" min="-100" max="100" value={b.eyeSize}
+        <label for="sl-eye-size">目のサイズ <span>{formatSigned(b.eyeSize)}</span></label>
+        <input id="sl-eye-size" type="range" min="-100" max="100" value={b.eyeSize}
           oninput={(e) => updateParam('eyeSize', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>目の位置 <span>{formatSigned(b.eyePosition)}</span></label>
-        <input type="range" min="-100" max="100" value={b.eyePosition}
+        <label for="sl-eye-position">目の位置 <span>{formatSigned(b.eyePosition)}</span></label>
+        <input id="sl-eye-position" type="range" min="-100" max="100" value={b.eyePosition}
           oninput={(e) => updateParam('eyePosition', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>黒目サイズ <span>{formatSigned(b.irisSize)}</span></label>
-        <input type="range" min="-100" max="100" value={b.irisSize}
+        <label for="sl-iris-size">黒目サイズ <span>{formatSigned(b.irisSize)}</span></label>
+        <input id="sl-iris-size" type="range" min="-100" max="100" value={b.irisSize}
           oninput={(e) => updateParam('irisSize', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>タレ目/つり目 <span>{formatSigned(b.eyeTilt)}</span></label>
-        <input type="range" min="-100" max="100" value={b.eyeTilt}
+        <label for="sl-eye-tilt">タレ目/つり目 <span>{formatSigned(b.eyeTilt)}</span></label>
+        <input id="sl-eye-tilt" type="range" min="-100" max="100" value={b.eyeTilt}
           oninput={(e) => updateParam('eyeTilt', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>目の反射 <span>{b.eyeSparkle}</span></label>
-        <input type="range" min="0" max="100" value={b.eyeSparkle}
+        <label for="sl-eye-sparkle">目の反射 <span>{b.eyeSparkle}</span></label>
+        <input id="sl-eye-sparkle" type="range" min="0" max="100" value={b.eyeSparkle}
           oninput={(e) => updateParam('eyeSparkle', +(e.target as HTMLInputElement).value)} />
       </div>
       <div class="row">
-        <label>クマとり <span>{b.darkCircle}</span></label>
-        <input type="range" min="0" max="100" value={b.darkCircle}
+        <label for="sl-dark-circle">クマとり <span>{b.darkCircle}</span></label>
+        <input id="sl-dark-circle" type="range" min="0" max="100" value={b.darkCircle}
           oninput={(e) => updateParam('darkCircle', +(e.target as HTMLInputElement).value)} />
       </div>
       <div class="row">
-        <label>涙袋 <span>{b.tearBag}</span></label>
-        <input type="range" min="0" max="100" value={b.tearBag}
+        <label for="sl-tear-bag">涙袋 <span>{b.tearBag}</span></label>
+        <input id="sl-tear-bag" type="range" min="0" max="100" value={b.tearBag}
           oninput={(e) => updateParam('tearBag', +(e.target as HTMLInputElement).value)} />
       </div>
     </div>
@@ -190,23 +190,23 @@
     {#if open.has('mouth')}
     <div class="sec-body">
       <div class="row">
-        <label>口サイズ <span>{formatSigned(b.mouthSize)}</span></label>
-        <input type="range" min="-100" max="100" value={b.mouthSize}
+        <label for="sl-mouth-size">口サイズ <span>{formatSigned(b.mouthSize)}</span></label>
+        <input id="sl-mouth-size" type="range" min="-100" max="100" value={b.mouthSize}
           oninput={(e) => updateParam('mouthSize', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>口角 <span>{formatSigned(b.mouthCorner)}</span></label>
-        <input type="range" min="-100" max="100" value={b.mouthCorner}
+        <label for="sl-mouth-corner">口角 <span>{formatSigned(b.mouthCorner)}</span></label>
+        <input id="sl-mouth-corner" type="range" min="-100" max="100" value={b.mouthCorner}
           oninput={(e) => updateParam('mouthCorner', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>口の位置 <span>{formatSigned(b.philtrum)}</span></label>
-        <input type="range" min="-100" max="100" value={b.philtrum}
+        <label for="sl-philtrum">口の位置 <span>{formatSigned(b.philtrum)}</span></label>
+        <input id="sl-philtrum" type="range" min="-100" max="100" value={b.philtrum}
           oninput={(e) => updateParam('philtrum', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>歯ホワイトニング <span>{b.teethWhitening}</span></label>
-        <input type="range" min="0" max="100" value={b.teethWhitening}
+        <label for="sl-teeth-whitening">歯ホワイトニング <span>{b.teethWhitening}</span></label>
+        <input id="sl-teeth-whitening" type="range" min="0" max="100" value={b.teethWhitening}
           oninput={(e) => updateParam('teethWhitening', +(e.target as HTMLInputElement).value)} />
       </div>
     </div>
@@ -230,8 +230,8 @@
           {/each}
         </div>
         <div class="row">
-          <label>強さ <span>{b.cheekStrength}</span></label>
-          <input type="range" min="0" max="100" value={b.cheekStrength}
+          <label for="sl-cheek-strength">強さ <span>{b.cheekStrength}</span></label>
+          <input id="sl-cheek-strength" type="range" min="0" max="100" value={b.cheekStrength}
             oninput={(e) => updateParam('cheekStrength', +(e.target as HTMLInputElement).value)} />
         </div>
       </div>
@@ -245,8 +245,8 @@
           {/each}
         </div>
         <div class="row">
-          <label>強さ <span>{b.lipStrength}</span></label>
-          <input type="range" min="0" max="100" value={b.lipStrength}
+          <label for="sl-lip-strength">強さ <span>{b.lipStrength}</span></label>
+          <input id="sl-lip-strength" type="range" min="0" max="100" value={b.lipStrength}
             oninput={(e) => updateParam('lipStrength', +(e.target as HTMLInputElement).value)} />
         </div>
       </div>

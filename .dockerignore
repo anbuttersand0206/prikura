@@ -34,7 +34,11 @@ assets/frames/
 frontend/node_modules/
 frontend/dist/
 frontend/.vite/
-frontend/src/wasm/
+# pen_engine.wasm/js は emcc のビルド成果物なので除外する。
+# Dockerfile が pen_engine.js のスタブを生成するため .js も除外。
+# penEngineLoader.ts はソースファイルなので除外してはならない。
+frontend/src/wasm/*.wasm
+frontend/src/wasm/*.js
 
 # ── Python キャッシュ ─────────────────────────────────────────
 **/__pycache__/

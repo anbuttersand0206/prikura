@@ -13,18 +13,22 @@
   $: currentCheekColor = String(b.cheekColor);
   $: currentLipColor   = String(b.lipColor);
 
+  // 「肌」セクションだけを初期開放する。
+  // 肌補正は最も使用頻度が高く、開いた状態でスクロールを始める UX にしている。
   let open = new Set<string>(['skin']);
 
   function toggle(id: string) {
     open.has(id) ? open.delete(id) : open.add(id);
-    open = open;
+    open = open; // Svelte のリアクティビティを発火させるための再代入
   }
 
-  function upd(key: string, val: number | string) {
+  /** スライダー値を appState に反映する。テンプレートから頻繁に呼ばれるため短い名前にしている。 */
+  function updateParam(key: string, val: number | string) {
     appState.updateBeauty({ [key]: val } as any);
   }
 
-  function fmt(v: number) { return v > 0 ? `+${v}` : `${v}`; }
+  /** 正負を明示した文字列に変換する（+10, -5 のように表示するため）。 */
+  function formatSigned(v: number) { return v > 0 ? `+${v}` : `${v}`; }
 </script>
 
 <div class="beauty-panel">
@@ -40,27 +44,27 @@
       <div class="row">
         <label>美肌 <span>{b.smoothing}</span></label>
         <input type="range" min="0" max="100" value={b.smoothing}
-          oninput={(e) => upd('smoothing', +(e.target as HTMLInputElement).value)} />
+          oninput={(e) => updateParam('smoothing', +(e.target as HTMLInputElement).value)} />
       </div>
       <div class="row">
         <label>シャープネス <span>{b.sharpness}</span></label>
         <input type="range" min="0" max="100" value={b.sharpness}
-          oninput={(e) => upd('sharpness', +(e.target as HTMLInputElement).value)} />
+          oninput={(e) => updateParam('sharpness', +(e.target as HTMLInputElement).value)} />
       </div>
       <div class="row">
-        <label>明るさ <span>{fmt(b.skinBrightness)}</span></label>
+        <label>明るさ <span>{formatSigned(b.skinBrightness)}</span></label>
         <input type="range" min="-100" max="100" value={b.skinBrightness}
-          oninput={(e) => upd('skinBrightness', +(e.target as HTMLInputElement).value)} class="bi" />
+          oninput={(e) => updateParam('skinBrightness', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>色温度 <span>{fmt(b.skinWarmth)}</span></label>
+        <label>色温度 <span>{formatSigned(b.skinWarmth)}</span></label>
         <input type="range" min="-100" max="100" value={b.skinWarmth}
-          oninput={(e) => upd('skinWarmth', +(e.target as HTMLInputElement).value)} class="warm" />
+          oninput={(e) => updateParam('skinWarmth', +(e.target as HTMLInputElement).value)} class="warm" />
       </div>
       <div class="row">
         <label>美白 <span>{b.whitening}</span></label>
         <input type="range" min="0" max="100" value={b.whitening}
-          oninput={(e) => upd('whitening', +(e.target as HTMLInputElement).value)} />
+          oninput={(e) => updateParam('whitening', +(e.target as HTMLInputElement).value)} />
       </div>
     </div>
     {/if}
@@ -75,34 +79,34 @@
     {#if open.has('face')}
     <div class="sec-body">
       <div class="row">
-        <label>顔痩せ <span>{fmt(b.faceSlim)}</span></label>
+        <label>顔痩せ <span>{formatSigned(b.faceSlim)}</span></label>
         <input type="range" min="-100" max="100" value={b.faceSlim}
-          oninput={(e) => upd('faceSlim', +(e.target as HTMLInputElement).value)} class="bi" />
+          oninput={(e) => updateParam('faceSlim', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>頭サイズ <span>{fmt(b.headSize)}</span></label>
+        <label>頭サイズ <span>{formatSigned(b.headSize)}</span></label>
         <input type="range" min="-100" max="100" value={b.headSize}
-          oninput={(e) => upd('headSize', +(e.target as HTMLInputElement).value)} class="bi" />
+          oninput={(e) => updateParam('headSize', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>中顔面短縮 <span>{fmt(b.midFace)}</span></label>
+        <label>中顔面短縮 <span>{formatSigned(b.midFace)}</span></label>
         <input type="range" min="-100" max="100" value={b.midFace}
-          oninput={(e) => upd('midFace', +(e.target as HTMLInputElement).value)} class="bi" />
+          oninput={(e) => updateParam('midFace', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>頬横幅 <span>{fmt(b.cheekWidth)}</span></label>
+        <label>頬横幅 <span>{formatSigned(b.cheekWidth)}</span></label>
         <input type="range" min="-100" max="100" value={b.cheekWidth}
-          oninput={(e) => upd('cheekWidth', +(e.target as HTMLInputElement).value)} class="bi" />
+          oninput={(e) => updateParam('cheekWidth', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>エラ削り <span>{fmt(b.jaw)}</span></label>
+        <label>エラ削り <span>{formatSigned(b.jaw)}</span></label>
         <input type="range" min="-100" max="100" value={b.jaw}
-          oninput={(e) => upd('jaw', +(e.target as HTMLInputElement).value)} class="bi" />
+          oninput={(e) => updateParam('jaw', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>顎縦幅 <span>{fmt(b.chinLength)}</span></label>
+        <label>顎縦幅 <span>{formatSigned(b.chinLength)}</span></label>
         <input type="range" min="-100" max="100" value={b.chinLength}
-          oninput={(e) => upd('chinLength', +(e.target as HTMLInputElement).value)} class="bi" />
+          oninput={(e) => updateParam('chinLength', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
     </div>
     {/if}
@@ -117,14 +121,14 @@
     {#if open.has('nose')}
     <div class="sec-body">
       <div class="row">
-        <label>小鼻サイズ <span>{fmt(b.noseWidth)}</span></label>
+        <label>小鼻サイズ <span>{formatSigned(b.noseWidth)}</span></label>
         <input type="range" min="-100" max="100" value={b.noseWidth}
-          oninput={(e) => upd('noseWidth', +(e.target as HTMLInputElement).value)} class="bi" />
+          oninput={(e) => updateParam('noseWidth', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>鼻縦幅 <span>{fmt(b.noseHeight)}</span></label>
+        <label>鼻縦幅 <span>{formatSigned(b.noseHeight)}</span></label>
         <input type="range" min="-100" max="100" value={b.noseHeight}
-          oninput={(e) => upd('noseHeight', +(e.target as HTMLInputElement).value)} class="bi" />
+          oninput={(e) => updateParam('noseHeight', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
     </div>
     {/if}
@@ -139,39 +143,39 @@
     {#if open.has('eye')}
     <div class="sec-body">
       <div class="row">
-        <label>目のサイズ <span>{fmt(b.eyeSize)}</span></label>
+        <label>目のサイズ <span>{formatSigned(b.eyeSize)}</span></label>
         <input type="range" min="-100" max="100" value={b.eyeSize}
-          oninput={(e) => upd('eyeSize', +(e.target as HTMLInputElement).value)} class="bi" />
+          oninput={(e) => updateParam('eyeSize', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>目の位置 <span>{fmt(b.eyePosition)}</span></label>
+        <label>目の位置 <span>{formatSigned(b.eyePosition)}</span></label>
         <input type="range" min="-100" max="100" value={b.eyePosition}
-          oninput={(e) => upd('eyePosition', +(e.target as HTMLInputElement).value)} class="bi" />
+          oninput={(e) => updateParam('eyePosition', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>黒目サイズ <span>{fmt(b.irisSize)}</span></label>
+        <label>黒目サイズ <span>{formatSigned(b.irisSize)}</span></label>
         <input type="range" min="-100" max="100" value={b.irisSize}
-          oninput={(e) => upd('irisSize', +(e.target as HTMLInputElement).value)} class="bi" />
+          oninput={(e) => updateParam('irisSize', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>タレ目/つり目 <span>{fmt(b.eyeTilt)}</span></label>
+        <label>タレ目/つり目 <span>{formatSigned(b.eyeTilt)}</span></label>
         <input type="range" min="-100" max="100" value={b.eyeTilt}
-          oninput={(e) => upd('eyeTilt', +(e.target as HTMLInputElement).value)} class="bi" />
+          oninput={(e) => updateParam('eyeTilt', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
         <label>目の反射 <span>{b.eyeSparkle}</span></label>
         <input type="range" min="0" max="100" value={b.eyeSparkle}
-          oninput={(e) => upd('eyeSparkle', +(e.target as HTMLInputElement).value)} />
+          oninput={(e) => updateParam('eyeSparkle', +(e.target as HTMLInputElement).value)} />
       </div>
       <div class="row">
         <label>クマとり <span>{b.darkCircle}</span></label>
         <input type="range" min="0" max="100" value={b.darkCircle}
-          oninput={(e) => upd('darkCircle', +(e.target as HTMLInputElement).value)} />
+          oninput={(e) => updateParam('darkCircle', +(e.target as HTMLInputElement).value)} />
       </div>
       <div class="row">
         <label>涙袋 <span>{b.tearBag}</span></label>
         <input type="range" min="0" max="100" value={b.tearBag}
-          oninput={(e) => upd('tearBag', +(e.target as HTMLInputElement).value)} />
+          oninput={(e) => updateParam('tearBag', +(e.target as HTMLInputElement).value)} />
       </div>
     </div>
     {/if}
@@ -186,24 +190,24 @@
     {#if open.has('mouth')}
     <div class="sec-body">
       <div class="row">
-        <label>口サイズ <span>{fmt(b.mouthSize)}</span></label>
+        <label>口サイズ <span>{formatSigned(b.mouthSize)}</span></label>
         <input type="range" min="-100" max="100" value={b.mouthSize}
-          oninput={(e) => upd('mouthSize', +(e.target as HTMLInputElement).value)} class="bi" />
+          oninput={(e) => updateParam('mouthSize', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>口角 <span>{fmt(b.mouthCorner)}</span></label>
+        <label>口角 <span>{formatSigned(b.mouthCorner)}</span></label>
         <input type="range" min="-100" max="100" value={b.mouthCorner}
-          oninput={(e) => upd('mouthCorner', +(e.target as HTMLInputElement).value)} class="bi" />
+          oninput={(e) => updateParam('mouthCorner', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
-        <label>口の位置 <span>{fmt(b.philtrum)}</span></label>
+        <label>口の位置 <span>{formatSigned(b.philtrum)}</span></label>
         <input type="range" min="-100" max="100" value={b.philtrum}
-          oninput={(e) => upd('philtrum', +(e.target as HTMLInputElement).value)} class="bi" />
+          oninput={(e) => updateParam('philtrum', +(e.target as HTMLInputElement).value)} class="bi" />
       </div>
       <div class="row">
         <label>歯ホワイトニング <span>{b.teethWhitening}</span></label>
         <input type="range" min="0" max="100" value={b.teethWhitening}
-          oninput={(e) => upd('teethWhitening', +(e.target as HTMLInputElement).value)} />
+          oninput={(e) => updateParam('teethWhitening', +(e.target as HTMLInputElement).value)} />
       </div>
     </div>
     {/if}
@@ -222,13 +226,13 @@
         <div class="color-row">
           {#each CHEEK_COLORS as c}
             <button class="color-dot" class:sel={currentCheekColor === c}
-              style="background:{c}" aria-label={c} onclick={() => upd('cheekColor', c)}></button>
+              style="background:{c}" aria-label={c} onclick={() => updateParam('cheekColor', c)}></button>
           {/each}
         </div>
         <div class="row">
           <label>強さ <span>{b.cheekStrength}</span></label>
           <input type="range" min="0" max="100" value={b.cheekStrength}
-            oninput={(e) => upd('cheekStrength', +(e.target as HTMLInputElement).value)} />
+            oninput={(e) => updateParam('cheekStrength', +(e.target as HTMLInputElement).value)} />
         </div>
       </div>
 
@@ -237,13 +241,13 @@
         <div class="color-row">
           {#each LIP_COLORS as c}
             <button class="color-dot" class:sel={currentLipColor === c}
-              style="background:{c}" aria-label={c} onclick={() => upd('lipColor', c)}></button>
+              style="background:{c}" aria-label={c} onclick={() => updateParam('lipColor', c)}></button>
           {/each}
         </div>
         <div class="row">
           <label>強さ <span>{b.lipStrength}</span></label>
           <input type="range" min="0" max="100" value={b.lipStrength}
-            oninput={(e) => upd('lipStrength', +(e.target as HTMLInputElement).value)} />
+            oninput={(e) => updateParam('lipStrength', +(e.target as HTMLInputElement).value)} />
         </div>
       </div>
 

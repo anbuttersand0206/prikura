@@ -47,6 +47,9 @@ class FaceMeshDetector:
         if _MP_AVAILABLE:
             self._mesh = _mp_face_mesh.FaceMesh(
                 max_num_faces=max_num_faces,
+                # refine_landmarks=True にすると通常の 468 点に加えて
+                # 虹彩ランドマーク（468/473 = 左右の虹彩中心）が使えるようになる。
+                # 目の拡大・黒目サイズ変更・目の反射処理で必要なため有効化している。
                 refine_landmarks=True,
                 min_detection_confidence=0.5,
                 min_tracking_confidence=0.5,

@@ -116,14 +116,11 @@
 
   // ── タイマー管理 ─────────────────────────────────────────────
   let countdownInterval: ReturnType<typeof setInterval> | null = null;
-  let intervalPhaseTimeout: ReturnType<typeof setTimeout> | null = null;
 
   /** 全てのタイマーを安全に停止する（コンポーネント破棄時・戻るボタン時） */
   function clearAllTimers() {
     if (countdownInterval) clearInterval(countdownInterval);
-    if (intervalPhaseTimeout) clearTimeout(intervalPhaseTimeout);
     countdownInterval = null;
-    intervalPhaseTimeout = null;
   }
 
   /**

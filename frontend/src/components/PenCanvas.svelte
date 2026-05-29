@@ -219,7 +219,6 @@
   onMount(() => {
     // Wasm ペンエンジンを先読み（fire-and-forget）
     // ロード完了後は interpolate() が自動的に Wasm 版に切り替わる
-    // console.log('[PenCanvas] 描画画面オープン — Wasm ペンエンジンの先読み開始');
     initPenEngine();
 
     // Ctrl+Z / Cmd+Z でキーボードから Undo できるようにする

@@ -480,8 +480,11 @@ class FaceProcessor:
         a_len = math.sqrt(ax * ax + ay * ay)
         if a_len < 10:
             return img  # 顔が小さすぎる（検出ミス等）場合はスキップ
-        ax /= a_len;  ay /= a_len          # 単位ベクトル化: 顎方向
-        px_u = -ay;   py_u = ax            # 垂直方向単位ベクトル: 顔の横方向
+        ax /= a_len
+        ay /= a_len
+        # 顎方向軸を90度回転して横方向の単位ベクトルを得る
+        px_u = -ay
+        py_u = ax
 
         # 全ピクセルの座標グリッドを作成（NumPy のベクトル演算で高速化）
         ys, xs = np.mgrid[0:h, 0:w].astype(np.float32)

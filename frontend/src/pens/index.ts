@@ -107,21 +107,6 @@ export function catmullRom(points: Point[], tension = 0.5): Point[] {
   return result;
 }
 
-/**
- * 補間済みの点列を Canvas に描画するユーティリティ。
- * 各グループのペンが内部で使う場合に便利。
- */
-function drawSmooth(ctx: CanvasRenderingContext2D, points: Point[], tension = 0.5) {
-  const smooth = catmullRom(points, tension);
-  if (smooth.length < 2) return;
-  ctx.beginPath();
-  ctx.moveTo(smooth[0].x, smooth[0].y);
-  for (let i = 1; i < smooth.length; i++) {
-    ctx.lineTo(smooth[i].x, smooth[i].y);
-  }
-  ctx.stroke();
-}
-
 // ── カラーパレット ────────────────────────────────────────────
 
 /**

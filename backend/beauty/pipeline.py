@@ -25,8 +25,9 @@ from .color     import (
 
 # チーク・リップ・涙袋はここで直接実装（pipeline 内の小関数）
 def _hex_to_bgr(hex_color: str):
-    h = hex_color.lstrip('#')
-    r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+    # OpenCV は RGB でなく BGR（Blue→Green→Red）の順なので R と B を入れ替える
+    hex_str = hex_color.lstrip('#')
+    r, g, b = int(hex_str[0:2], 16), int(hex_str[2:4], 16), int(hex_str[4:6], 16)
     return (b, g, r)
 
 
@@ -102,9 +103,10 @@ def _apply_dark_circle(img: np.ndarray, lm: FaceLandmarks, params: 'BeautyParams
     h, w  = img.shape[:2]
     out   = img.copy().astype(np.float32)
     alpha = float(params.dark_circle_strength) * 0.67
-    for a, b_idx in [(374, 380), (145, 153)]:
-        cx = (lm.pt(a)[0] + lm.pt(b_idx)[0]) // 2
-        cy = (lm.pt(a)[1] + lm.pt(b_idx)[1]) // 2
+    # (374, 380) = 右目下まぶた2点, (145, 153) = 左目下まぶた2点
+    for outer_idx, inner_idx in [(374, 380), (145, 153)]:
+        cx = (lm.pt(outer_idx)[0] + lm.pt(inner_idx)[0]) // 2
+        cy = (lm.pt(outer_idx)[1] + lm.pt(inner_idx)[1]) // 2
         cy += int(h * 0.018)
         r  = int(w * 0.028)
         mask = np.zeros((h, w), np.float32)
@@ -279,12 +281,12 @@ class BeautyPipeline:
 
         # ── 後処理（最小限） ──────────────────────────────────────
         # ① 小さなノイズ除去（細かい飛び地を消す）
-        m8 = (alpha * 255).astype(np.uint8)
+        mask_uint8 = (alpha * 255).astype(np.uint8)
         kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
-        m8 = cv2.morphologyEx(m8, cv2.MORPH_CLOSE, kernel_close)
+        mask_uint8 = cv2.morphologyEx(mask_uint8, cv2.MORPH_CLOSE, kernel_close)
 
         # ② 輪郭ブレンド用の軽いぼかし（ハードエッジを和らげる）
-        alpha = cv2.GaussianBlur(m8.astype(np.float32) / 255, (7, 7), 2.0)
+        alpha = cv2.GaussianBlur(mask_uint8.astype(np.float32) / 255, (7, 7), 2.0)
 
         return alpha
 
@@ -314,10 +316,10 @@ class BeautyPipeline:
         h, w = bgr.shape[:2]
         mask = self._body_mask(bgr)  # float32 H×W, 0–1（1=人物）
 
-        hc = bg_color.lstrip('#')
-        r_val = int(hc[0:2], 16)
-        g_val = int(hc[2:4], 16)
-        b_val = int(hc[4:6], 16)
+        hex_str = bg_color.lstrip('#')
+        r_val = int(hex_str[0:2], 16)
+        g_val = int(hex_str[2:4], 16)
+        b_val = int(hex_str[4:6], 16)
         bg = np.empty((h, w, 3), np.float32)
         bg[:, :, 0] = b_val   # BGR
         bg[:, :, 1] = g_val

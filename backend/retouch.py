@@ -1,7 +1,9 @@
 """
-Retouch module — standalone convenience wrappers.
-Actual implementation lives in face_processor.py.
-Exported here as the directory structure specifies retouch.py separately.
+retouch.py — face_processor.py の公開インターフェース。
+
+beauty/ パッケージに移行した後も、旧 API を参照するコードとの後方互換を
+保つために残している薄いラッパーモジュール。
+新規コードからは beauty.pipeline を直接使うこと。
 """
 from face_processor import (
     RetouchParams,

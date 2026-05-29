@@ -1,11 +1,9 @@
 // ============================================================
-// pens/group3_texture.ts — グループ3: 質感系ペン（5種）
+// pens/group3_texture.ts — グループ3: 質感系ペン（3種）
 //
-// 白ネオン / 黒ネオン / ぷっくり / ぷっくりカゲ / クレヨン
+// ぷっくり / ぷっくりカゲ / クレヨン
 //
 // 【特徴】
-// ネオン系はグループ1のカラーネオンと似た方式ですが
-// 色が固定（白 or 黒）です。
 // ぷっくり系は白いハイライト線を上に重ねることで
 // 丸みのある立体感を出します。
 // クレヨンは複数の微妙にずれたレイヤーと
@@ -28,7 +26,7 @@ import { interpolate } from '../wasm/penEngineLoader';
  * 係数（127.1, 311.7, 43758.5453）はノイズ生成でよく使われる
  * 定番の魔法数。これにより小数部がよく分散する。
  */
-function sr(seed: number): number {
+function hashRandom(seed: number): number {
   const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
   return x - Math.floor(x); // 小数部だけ取り出して 0〜1 にする
 }
@@ -136,7 +134,7 @@ export const group3Pens: PenConfig[] = [
   //   2. 点列の各点近くにランダムな小さい円を散らす（点描）
   //      → 紙の凹凸にインクが乗ったようなザラザラ感
   //
-  // 全てのランダムに sr()（決定論的ハッシュ）を使うことで
+  // 全てのランダムに hashRandom()（決定論的ハッシュ）を使うことで
   // Undo しても質感が変わらない。
   // ────────────────────────────────────────────────────────────
   {
@@ -157,14 +155,14 @@ export const group3Pens: PenConfig[] = [
       for (let layer = 0; layer < 3; layer++) {
         ctx.globalAlpha = opacity * 0.4; // 半透明で重ねる
         ctx.strokeStyle = color;
-        // sr() でレイヤーごとに少し違う幅にする（±25%程度のぶれ）
-        ctx.lineWidth = size + (sr(layer * 7.1) - 0.5) * size * 0.5;
+        // hashRandom() でレイヤーごとに少し違う幅にする（±25%程度のぶれ）
+        ctx.lineWidth = size + (hashRandom(layer * 7.1) - 0.5) * size * 0.5;
         ctx.beginPath();
         ctx.moveTo(smooth[0].x, smooth[0].y);
         smooth.forEach((p, pi) => ctx.lineTo(
           // 各点の位置もわずかにずらす（±0.75px 程度）
-          p.x + (sr(layer * 100 + pi * 3.1) - 0.5) * 1.5,
-          p.y + (sr(layer * 200 + pi * 3.7) - 0.5) * 1.5,
+          p.x + (hashRandom(layer * 100 + pi * 3.1) - 0.5) * 1.5,
+          p.y + (hashRandom(layer * 200 + pi * 3.7) - 0.5) * 1.5,
         ));
         ctx.stroke();
       }
@@ -174,13 +172,13 @@ export const group3Pens: PenConfig[] = [
       for (let i = 0; i < smooth.length; i += 2) {
         for (let n = 0; n < 3; n++) {
           const seed = i * 31 + n * 7; // 点ごとに一意なシード
-          const ox = (sr(seed + 1) - 0.5) * size;    // X 方向のオフセット
-          const oy = (sr(seed + 2) - 0.5) * size;    // Y 方向のオフセット
-          const r  = sr(seed + 3) * size * 0.3;       // 円の半径（最大 size*30%）
+          const ox = (hashRandom(seed + 1) - 0.5) * size;    // X 方向のオフセット
+          const oy = (hashRandom(seed + 2) - 0.5) * size;    // Y 方向のオフセット
+          const r  = hashRandom(seed + 3) * size * 0.3;       // 円の半径（最大 size*30%）
 
           // 白と本体色の小円をランダムに混在させて紙の凹凸感を出す
-          ctx.globalAlpha = opacity * (0.05 + sr(seed + 4) * 0.15);
-          ctx.fillStyle = sr(seed + 5) > 0.5 ? 'white' : color;
+          ctx.globalAlpha = opacity * (0.05 + hashRandom(seed + 4) * 0.15);
+          ctx.fillStyle = hashRandom(seed + 5) > 0.5 ? 'white' : color;
           ctx.beginPath();
           ctx.arc(smooth[i].x + ox, smooth[i].y + oy, r, 0, Math.PI * 2);
           ctx.fill();

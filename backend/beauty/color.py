@@ -28,7 +28,11 @@ _LOWER_LIP_INNER = [95, 88, 178, 87, 14, 317, 402, 318, 324]
 # ── ユーティリティ ────────────────────────────────────────────
 
 def _skin_mask_float(bgr: np.ndarray, blur: int = 15) -> np.ndarray:
-    """YCrCb 肌マスク（float32, shape (H,W,1)）。"""
+    """YCrCb 色空間で肌領域を検出し、0〜1 の float32 マスク（shape H×W×1）を返す。
+
+    shape を (H,W,1) にするのは、後続の処理で (H,W,3) の画像配列と
+    NumPy ブロードキャストで乗算できるようにするため。
+    """
     ycrcb = cv2.cvtColor(bgr, cv2.COLOR_BGR2YCrCb)
     mask  = cv2.inRange(ycrcb, _SKIN_LOWER, _SKIN_UPPER).astype(np.float32) / 255.0
     mask  = cv2.GaussianBlur(mask, (blur, blur), blur / 3.0)
@@ -36,7 +40,11 @@ def _skin_mask_float(bgr: np.ndarray, blur: int = 15) -> np.ndarray:
 
 
 def _landmark_mask(h: int, w: int, pts: np.ndarray, blur: int) -> np.ndarray:
-    """ランドマーク群の凸包を塗りつぶしてぼかしたマスク（float32 2D）。"""
+    """ランドマーク群の凸包を塗りつぶしてぼかしたマスク（float32 H×W）を返す。
+
+    凸包（convexHull）を使うのは、ランドマーク点列が歯や口唇のように
+    ギザギザしている場合でも穴なく塗りつぶせるようにするため。
+    """
     mask = np.zeros((h, w), np.uint8)
     hull = cv2.convexHull(pts)
     cv2.fillConvexPoly(mask, hull, 255)
@@ -70,7 +78,12 @@ def whiten_skin(bgr: np.ndarray, strength: float,
 # ── トーンカーブ（色温度） ────────────────────────────────────
 
 def apply_tone(bgr: np.ndarray, warmth: float) -> np.ndarray:
-    """LUT で色温度を調整する。warmth: -1（クール）〜+1（ウォーム）。"""
+    """LUT で色温度を調整する。warmth: -1（クール）〜+1（ウォーム）。
+
+    R チャンネルを上げ B を下げると暖色方向になる。
+    チャンネル直加算でなく LUT（256 点の変換テーブル）を使うのは、
+    cv2.LUT がベクトル化済みで高速なため（ピクセルごとのループより速い）。
+    """
     if warmth == 0.0:
         return bgr
     shift_r = int(np.clip(warmth,  -1.0, 1.0) * 18)

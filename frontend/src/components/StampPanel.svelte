@@ -38,8 +38,9 @@
   // フォント選択状態（初期値: まるゴシック）
   let selectedFont = $state<FontDef>(FONTS[0]);
 
-  // フォントロード完了カウンター（増加するとフォントボタンが再描画される）
-  let _fontLoadCount = $state(0);
+  // フォントが読み込まれるたびにインクリメントして Svelte に再描画を促すリビジョン番号。
+  // {#key fontRevision} ブロックがこの値を監視してフォントボタンを再マウントする。
+  let fontRevision = $state(0);
 
   // base64 キャッシュ: url → { dataUrl, format }
   // SVG 生成のたびにフォントファイルを再取得しないために使う。
@@ -131,7 +132,7 @@
       if (!f.url) continue;
       loadFont(f.url).then(({ dataUrl }) => {
         ensureFontLoaded(f.name, dataUrl)
-          .then(() => { _fontLoadCount++; })
+          .then(() => { fontRevision++; })
           .catch(() => {});
       }).catch(() => {});
     }
@@ -218,7 +219,7 @@
     </div>
 
     <!-- フォント選択 -->
-    {#key _fontLoadCount}
+    {#key fontRevision}
     <div class="text-font-row">
       {#each FONTS as font}
         <button

@@ -177,11 +177,6 @@
     margin: 0 auto;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
   }
-  .setup-header p {
-    margin: 4px 0 0;
-    font-size: 0.9rem;
-    opacity: 0.9;
-  }
 
   .setup-body {
     flex: 1;
@@ -398,9 +393,6 @@
     }
     .header-logo {
       height: 44px;
-    }
-    .setup-header p {
-      font-size: 0.8rem;
     }
 
     .body-inner {

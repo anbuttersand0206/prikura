@@ -84,6 +84,10 @@ export const defaultBeauty: BeautySettings = {
   tearBag: 0,
 };
 
+// ファクトリ関数パターンを使う理由:
+// Svelte の writable ストアを直接 export すると内部 state が外から直接 set() できてしまう。
+// ファクトリでメソッド（setPhase 等）だけを公開することで、
+// 状態変更の経路を限定し、意図しない上書きを防ぐ。
 function createAppState() {
   const { subscribe, set, update } = writable({
     phase: 'setup' as Phase,

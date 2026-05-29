@@ -777,6 +777,9 @@
     {/if}
     <div bind:this={canvasAnimEl} class="canvas-anim-wrapper">
       <div class="canvas-scale-outer" style="width:{FRAME_W * canvasScale}px; height:{FRAME_H * canvasScale}px;">
+    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+    <!-- role="application" はドロー・スタンプ操作を受け付けるインタラクティブ領域だが、
+         Svelte の a11y チェッカーが "application" ロールを interactive として認識しないため ignore する。 -->
     <div
       bind:this={canvasStackEl}
       role="application"
@@ -823,11 +826,11 @@
           >
             {@html stamp.svg}
             {#if selectedStampId === stamp.id && !isEraser}
-              <div class="handle handle-tl" onmousedown={(e) => onResizeHandleMouseDown(e, stamp)}></div>
-              <div class="handle handle-tr" onmousedown={(e) => onResizeHandleMouseDown(e, stamp)}></div>
-              <div class="handle handle-bl" onmousedown={(e) => onResizeHandleMouseDown(e, stamp)}></div>
-              <div class="handle handle-br" onmousedown={(e) => onResizeHandleMouseDown(e, stamp)}></div>
-              <div class="handle handle-rotate" onmousedown={(e) => onRotateHandleMouseDown(e, stamp)}></div>
+              <button class="handle handle-tl" aria-label="リサイズ（左上）" onmousedown={(e) => onResizeHandleMouseDown(e, stamp)}></button>
+              <button class="handle handle-tr" aria-label="リサイズ（右上）" onmousedown={(e) => onResizeHandleMouseDown(e, stamp)}></button>
+              <button class="handle handle-bl" aria-label="リサイズ（左下）" onmousedown={(e) => onResizeHandleMouseDown(e, stamp)}></button>
+              <button class="handle handle-br" aria-label="リサイズ（右下）" onmousedown={(e) => onResizeHandleMouseDown(e, stamp)}></button>
+              <button class="handle handle-rotate" aria-label="回転" onmousedown={(e) => onRotateHandleMouseDown(e, stamp)}></button>
               <button
                 class="stamp-delete-btn"
                 aria-label="スタンプを削除"
@@ -1069,6 +1072,10 @@
     box-shadow: 0 1px 4px rgba(0,0,0,0.25);
     z-index: 10;
     pointer-events: auto;
+    /* button のデフォルトスタイルをリセット */
+    padding: 0;
+    font: inherit;
+    line-height: 1;
   }
   .handle-tl { top: -6px;  left: -6px;  cursor: nwse-resize; }
   .handle-tr { top: -6px;  right: -6px; cursor: nesw-resize; }

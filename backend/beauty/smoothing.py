@@ -41,8 +41,10 @@ def smooth_skin(bgr: np.ndarray, strength: float,
 
     blur_hp   = cv2.GaussianBlur(bgr, (0, 0), 3.0)
     high_pass = np.clip(bgr.astype(np.float32) - blur_hp.astype(np.float32) + 128, 0, 255)
-    tx = 0.28
-    blended = (smoothed.astype(np.float32) * (1.0 - tx) + high_pass * tx)
+    # ハイパスを少量混ぜることで bilateral フィルタ特有の「べったり感」を抑える。
+    # 0.28 は主観評価で決めた値：多すぎると毛穴が戻り、少なすぎると油絵感が出る。
+    high_pass_ratio = 0.28
+    blended = (smoothed.astype(np.float32) * (1.0 - high_pass_ratio) + high_pass * high_pass_ratio)
 
     result = bgr.astype(np.float32) * (1.0 - mask * alpha) + blended * (mask * alpha)
     return np.clip(result, 0, 255).astype(np.uint8)

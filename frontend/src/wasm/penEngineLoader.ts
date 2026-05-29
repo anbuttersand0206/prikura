@@ -27,7 +27,7 @@ type WasmModule = {
 };
 
 /** ロード済みのエンジンをキャッシュする変数（2回目以降は再ロード不要） */
-let _engine: WasmModule | null = null;
+let _cachedEngine: WasmModule | null = null;
 
 const TAG = '[PenEngine]';
 
@@ -38,23 +38,16 @@ const TAG = '[PenEngine]';
  */
 async function tryLoadWasm(): Promise<WasmModule | null> {
   try {
-    // console.log(`${TAG} Wasm ロード開始 … (この間は TypeScript 版で動作)`);
-    const t0 = performance.now();
-
     // 動的インポート — .wasm が存在しない場合ここで例外が発生する
     const PenEngineFactory = await import('./pen_engine.js' as string) as any;
     // Emscripten が生成したファクトリ関数を呼んでモジュールを初期化
     const mod = await PenEngineFactory.default();
-
-    const elapsed = (performance.now() - t0).toFixed(1);
 
     // C++ 関数を JS から呼べるようにラップ（cwrap = C function wrap）
     // 引数: (関数名, 戻り値型, [引数型の配列])
     const interpolateFn = mod.cwrap('catmull_rom_interpolate', 'number', [
       'number', 'number', 'number', 'number', 'number',
     ]);
-
-    // console.log(`${TAG} ✅ Wasm ロード完了 (${elapsed}ms) — C++ 版に切り替えました`);
 
     return {
       isWasm: true,
@@ -117,22 +110,22 @@ async function tryLoadWasm(): Promise<WasmModule | null> {
  * 2回目以降はキャッシュ済みのエンジンをそのまま返す。
  */
 export async function getPenEngine(): Promise<WasmModule> {
-  if (_engine) return _engine; // キャッシュがあれば即返す
+  if (_cachedEngine) return _cachedEngine; // キャッシュがあれば即返す
 
   const wasm = await tryLoadWasm();
 
   if (wasm) {
-    _engine = wasm;
+    _cachedEngine = wasm;
   } else {
-    _engine = { isWasm: false, catmullRomInterpolate: catmullRom };
-    // console.log(`${TAG} 🟡 TypeScript 版で動作中 (Wasm 未ビルドまたは非対応環境)`);
+    // Wasm が使えない場合は TypeScript 実装にフォールバックして継続する
+    _cachedEngine = { isWasm: false, catmullRomInterpolate: catmullRom };
   }
 
-  return _engine;
+  return _cachedEngine;
 }
 
-/** 切り替えログを1回だけ出すためのフラグ */
-let _switchLogged = false;
+/** 切り替えログを1回だけ出すためのフラグ（二重ログ防止） */
+let _hasSwitchLogged = false;
 
 /**
  * 同期的にスプライン補間を行う。
@@ -140,13 +133,13 @@ let _switchLogged = false;
  * ペンの render() は同期関数なので、このラッパーを介して呼ぶ。
  */
 export function interpolate(pts: Point[], tension = 0.5): Point[] {
-  if (_engine) {
-    if (!_switchLogged) {
-      _switchLogged = true;
-      const label = _engine.isWasm ? '🔵 C++ Wasm 版' : '🟡 TypeScript 版';
-      // console.log(`${TAG} 補間エンジン確定: ${label}`);
+  if (_cachedEngine) {
+    if (!_hasSwitchLogged) {
+      _hasSwitchLogged = true;
+      const label = _cachedEngine.isWasm ? 'C++ Wasm 版' : 'TypeScript 版';
+      console.info(`${TAG} 補間エンジン確定: ${label}`);
     }
-    return _engine.catmullRomInterpolate(pts, tension);
+    return _cachedEngine.catmullRomInterpolate(pts, tension);
   }
   return catmullRom(pts, tension); // Wasm 未ロード時のフォールバック
 }
